@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro - RutasFacil</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f2f2f2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .formulario {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 400px;
+            box-shadow: 0px 0px 10px #aaa;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #0066cc;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #004999;
+        }
+
+        h2 {
+            text-align: center;
+        }
+    </style>
+
+</head>
+
+<body>
+
+
+<div class="formulario">
+
+<h2>Crear Cuenta</h2>
+
+
+<form id="registroForm">
+
+
+<input type="text" id="nombres" placeholder="Nombres" required>
+
+<input type="text" id="apellidos" placeholder="Apellidos" required>
+
+<input type="text" id="cedula" placeholder="Cédula" required>
+
+<input type="email" id="email" placeholder="Correo">
+
+<input type="text" id="telefono" placeholder="Teléfono" required>
+
+
+<hr>
+
+
+<input type="text" id="username" placeholder="Usuario" required>
+
+<input type="password" id="password" placeholder="Contraseña" required>
+
+
+<button type="submit">
+Registrarse
+</button>
+
+
+</form>
+
+</div>
+
+
+
+<script>
+
+document.getElementById("registroForm")
+.addEventListener("submit", function(e){
+
+    e.preventDefault();
+
+
+    let datos = {
+
+        nombres: document.getElementById("nombres").value,
+        apellidos: document.getElementById("apellidos").value,
+        cedula: document.getElementById("cedula").value,
+        email: document.getElementById("email").value,
+        telefono: document.getElementById("telefono").value,
+
+        username: document.getElementById("username").value,
+        password: document.getElementById("password").value
+
+    };
+
+
+    fetch("http://localhost:8081/registro", {
+
+        method: "POST",
+
+        headers:{
+            "Content-Type":"application/json"
+        },
+
+        body: JSON.stringify(datos)
+
+    })
+
+    .then(res => res.json())
+
+    .then(data => {
+
+        alert("Registro exitoso");
+
+        console.log(data);
+
+    })
+
+    .catch(error => {
+
+        alert("Error al registrar");
+
+        console.log(error);
+
+    });
+
+
+});
+
+
+</script>
+
+
+</body>
+</html>
