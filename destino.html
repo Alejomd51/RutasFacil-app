@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>RutasFácil | Destino de Entrega</title>
+
+<style>
+
+:root{
+
+--verde:#10493D;
+--verde2:#16614F;
+--naranja:#FF6B35;
+--fondo:#F4F6F5;
+--borde:#D8DED9;
+--texto:#1D2521;
+
+}
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+
+font-family:'Segoe UI',Arial,sans-serif;
+background:var(--fondo);
+color:var(--texto);
+
+}
+
+header{
+
+background:var(--verde);
+color:white;
+padding:22px 30px;
+
+}
+
+header h1{
+
+font-size:24px;
+
+}
+
+header p{
+
+margin-top:5px;
+font-size:14px;
+
+}
+
+main{
+
+max-width:1100px;
+
+margin:30px auto;
+
+display:grid;
+
+grid-template-columns:1fr 1fr;
+
+gap:25px;
+
+padding:0 20px;
+
+}
+
+@media(max-width:900px){
+
+main{
+
+grid-template-columns:1fr;
+
+}
+
+}
+
+.tarjeta{
+
+background:white;
+
+border-radius:10px;
+
+border:1px solid var(--borde);
+
+padding:25px;
+
+}
+
+.tarjeta h2{
+
+color:var(--verde);
+
+border-bottom:3px solid var(--naranja);
+
+display:inline-block;
+
+padding-bottom:5px;
+
+margin-bottom:20px;
+
+}
+
+label{
+
+display:block;
+
+margin-top:15px;
+
+margin-bottom:5px;
+
+font-weight:bold;
+
+font-size:14px;
+
+}
+
+input,
+textarea,
+select{
+
+width:100%;
+
+padding:10px;
+
+font-size:15px;
+
+border-radius:6px;
+
+border:1px solid var(--borde);
+
+font-family:inherit;
+
+}
+
+input:focus,
+textarea:focus,
+select:focus{
+
+outline:none;
+
+border-color:var(--verde2);
+
+box-shadow:0 0 0 3px rgba(22,97,79,.15);
+
+}
+
+textarea{
+
+resize:vertical;
+
+}
+
+#buscador{
+
+margin-bottom:15px;
+
+}
+
+#mapa{
+
+width:100%;
+
+height:420px;
+
+border-radius:8px;
+
+border:1px solid var(--borde);
+
+}
+
+.btn{
+
+margin-top:25px;
+
+width:100%;
+
+padding:14px;
+
+background:var(--naranja);
+
+color:white;
+
+font-size:16px;
+
+border:none;
+
+border-radius:6px;
+
+cursor:pointer;
+
+transition:.3s;
+
+}
+
+.btn:hover{
+
+background:#e55b2b;
+
+}
+
+small{
+
+display:block;
+
+margin-top:10px;
+
+color:#6b6b6b;
+
+font-size:12px;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+
+<h1>RutasFácil</h1>
+
+<p>Paso 2 de 3 (66%) - Destino de la Encomienda</p>
+
+</header>
+
+<main>
+
+<section class="tarjeta">
+
+<h2>Destino</h2>
+
+<form id="formDestino">
+
+<label>Ciudad</label>
+
+<select id="ciudad" required>
+
+<option value="">Seleccione...</option>
+
+<option>Quito</option>
+
+<option>Guayaquil</option>
+
+<option>Cuenca</option>
+
+<option>Latacunga</option>
+
+<option>Ambato</option>
+
+<option>Riobamba</option>
+
+<option>Loja</option>
+
+<option>Manta</option>
+
+<option>Machala</option>
+
+<option>Portoviejo</option>
+
+<option>Ibarra</option>
+
+<option>Esmeraldas</option>
+
+<option>Santo Domingo</option>
+
+<option>Babahoyo</option>
+
+<option>Tulcán</option>
+
+<option>Puyo</option>
+
+<option>Tena</option>
+
+<option>Guaranda</option>
+
+<option>Azogues</option>
+
+</select>
+
+<label>Dirección exacta</label>
+
+<textarea
+id="direccion"
+rows="4"
+required
+placeholder="Ejemplo: Av. Amazonas y Naciones Unidas, edificio azul, segundo piso"></textarea>
+
+<label>Latitud</label>
+
+<input
+type="number"
+step="any"
+id="latitud"
+readonly>
+
+<label>Longitud</label>
+
+<input
+type="number"
+step="any"
+id="longitud"
+readonly>
+<button
+type="submit"
+class="btn">
+
+Siguiente →
+
+</button>
+
+</form>
+
+</section>
+
+<section class="tarjeta">
+
+<h2>Ubicación en el mapa</h2>
+
+<input
+id="buscador"
+type="text"
+placeholder="Buscar dirección o lugar...">
+
+<div id="mapa"></div>
+
+<small>
+
+Seleccione la ubicación exacta de entrega.
+Puede buscar una dirección o mover el marcador sobre el mapa.
+
+</small>
+
+</section>
+
+</main>
+
+<script async defer
+src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBQWmOQNEU-49qklLKS9lHEDUz6C3tdFAE&libraries=places&callback=initMap">
+</script>
+
+<script>
+
+let mapa;
+
+let marcador;
+
+let buscador;
+
+const puntoInicial = {
+
+lat:-1.8312,
+
+lng:-78.1834
+
+};
+
+const ciudades={
+
+"Quito":{lat:-0.1807,lng:-78.4678},
+
+"Guayaquil":{lat:-2.1709,lng:-79.9224},
+
+"Cuenca":{lat:-2.9001,lng:-79.0059},
+
+"Latacunga":{lat:-0.9333,lng:-78.6167},
+
+"Ambato":{lat:-1.2491,lng:-78.6168},
+
+"Riobamba":{lat:-1.6635,lng:-78.6546},
+
+"Loja":{lat:-3.9931,lng:-79.2042},
+
+"Manta":{lat:-0.9677,lng:-80.7089},
+
+"Machala":{lat:-3.2586,lng:-79.9605},
+
+"Portoviejo":{lat:-1.0546,lng:-80.4544},
+
+"Ibarra":{lat:0.3517,lng:-78.1223},
+
+"Esmeraldas":{lat:0.9592,lng:-79.6539},
+
+"Santo Domingo":{lat:-0.2526,lng:-79.1719},
+
+"Babahoyo":{lat:-1.8022,lng:-79.5345},
+
+"Tulcán":{lat:0.8119,lng:-77.7173},
+
+"Puyo":{lat:-1.4920,lng:-78.0026},
+
+"Tena":{lat:-0.9930,lng:-77.8129},
+
+"Guaranda":{lat:-1.5926,lng:-79.0002},
+
+"Azogues":{lat:-2.7394,lng:-78.8486}
+
+};
+
+function initMap(){
+
+mapa=new google.maps.Map(
+
+document.getElementById("mapa"),
+
+{
+
+center:puntoInicial,
+
+zoom:7
+
+}
+
+);
+
+marcador=new google.maps.Marker({
+
+position:puntoInicial,
+
+map:mapa,
+
+draggable:true
+
+});
+
+actualizarCoordenadas(puntoInicial);
+
+marcador.addListener("dragend",function(){
+
+const posicion=marcador.getPosition();
+
+actualizarCoordenadas({
+
+lat:posicion.lat(),
+
+lng:posicion.lng()
+
+});
+
+});
+
+mapa.addListener("click",function(evento){
+
+marcador.setPosition(evento.latLng);
+
+actualizarCoordenadas({
+
+lat:evento.latLng.lat(),
+
+lng:evento.latLng.lng()
+
+});
+
+});
+
+document.getElementById("ciudad").addEventListener("change",function(){
+
+const ciudad=this.value;
+
+if(!ciudades[ciudad]) return;
+
+const nuevaPosicion=ciudades[ciudad];
+
+mapa.setCenter(nuevaPosicion);
+
+mapa.setZoom(14);
+
+marcador.setPosition(nuevaPosicion);
+
+actualizarCoordenadas(nuevaPosicion);
+
+});
+
+const input=document.getElementById("buscador");
+
+buscador=new google.maps.places.Autocomplete(input);
+
+buscador.bindTo("bounds",mapa);
+
+buscador.addListener("place_changed",function(){
+
+const lugar=buscador.getPlace();
+
+if(!lugar.geometry){
+
+alert("No se encontró la ubicación.");
+
+return;
+
+}
+
+mapa.setCenter(lugar.geometry.location);
+
+mapa.setZoom(16);
+
+marcador.setPosition(lugar.geometry.location);
+
+actualizarCoordenadas({
+
+lat:lugar.geometry.location.lat(),
+
+lng:lugar.geometry.location.lng()
+
+});
+
+});
+
+}
+
+function actualizarCoordenadas(posicion){
+
+document.getElementById("latitud").value=Number(posicion.lat).toFixed(7);
+
+document.getElementById("longitud").value=Number(posicion.lng).toFixed(7);
+
+}
+// Validación del formulario
+document.getElementById("formDestino").addEventListener("submit", function(e){
+
+    e.preventDefault();
+
+    const ciudad = document.getElementById("ciudad").value;
+    const direccion = document.getElementById("direccion").value.trim();
+    const latitud = document.getElementById("latitud").value;
+    const longitud = document.getElementById("longitud").value;
+
+    if(ciudad === ""){
+        alert("Seleccione una ciudad.");
+        return;
+    }
+
+    if(direccion.length < 5){
+        alert("Ingrese una dirección válida.");
+        return;
+    }
+
+    if(latitud === "" || longitud === ""){
+        alert("Seleccione una ubicación en el mapa.");
+        return;
+    }
+
+    // Guardar temporalmente los datos para la siguiente página
+    sessionStorage.setItem("ciudad", ciudad);
+    sessionStorage.setItem("direccion", direccion);
+    sessionStorage.setItem("latitud", latitud);
+    sessionStorage.setItem("longitud", longitud);
+
+    // Ir al siguiente paso
+    window.location.href = "encomienda.html";
+
+});
+
+</script>
+
+</body>
+
+</html>

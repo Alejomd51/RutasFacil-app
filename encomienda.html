@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>RutasFácil | Registro de Encomienda</title>
+
+<style>
+
+:root{
+    --verde:#10493D;
+    --verde2:#16614F;
+    --naranja:#FF6B35;
+    --fondo:#F4F6F5;
+    --borde:#D8DED9;
+    --texto:#1D2521;
+}
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+body{
+
+font-family:'Segoe UI',Arial,sans-serif;
+background:var(--fondo);
+color:var(--texto);
+
+}
+
+header{
+
+background:var(--verde);
+color:white;
+padding:22px 30px;
+
+}
+
+header h1{
+font-size:24px;
+}
+
+header p{
+margin-top:5px;
+}
+
+
+main{
+
+max-width:700px;
+margin:35px auto;
+padding:0 20px;
+
+}
+
+
+.tarjeta{
+
+background:white;
+padding:25px;
+border-radius:10px;
+border:1px solid var(--borde);
+
+}
+
+
+h2{
+
+color:var(--verde);
+border-bottom:3px solid var(--naranja);
+display:inline-block;
+padding-bottom:5px;
+margin-bottom:20px;
+
+}
+
+
+label{
+
+display:block;
+font-weight:bold;
+margin-top:15px;
+margin-bottom:5px;
+
+}
+
+
+input,
+textarea,
+select{
+
+width:100%;
+padding:10px;
+border:1px solid var(--borde);
+border-radius:6px;
+font-size:15px;
+
+}
+
+
+input:focus,
+textarea:focus,
+select:focus{
+
+outline:none;
+border-color:var(--verde2);
+
+}
+
+
+.resumen{
+
+background:#F1F5F3;
+padding:15px;
+margin-bottom:20px;
+border-radius:8px;
+font-size:14px;
+
+}
+
+
+button{
+
+margin-top:25px;
+width:100%;
+padding:14px;
+background:var(--naranja);
+color:white;
+border:none;
+border-radius:6px;
+font-size:16px;
+cursor:pointer;
+
+}
+
+
+button:hover{
+
+background:#e55b2b;
+
+}
+
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<header>
+
+<h1>RutasFácil</h1>
+
+<p>Paso 3 de 3 (100%) - Datos de la Encomienda</p>
+
+</header>
+
+
+
+<main>
+
+
+<section class="tarjeta">
+
+
+<h2>Información del paquete</h2>
+
+
+<div class="resumen">
+
+<strong>Destino seleccionado:</strong>
+
+<p id="datosDestino">
+Cargando información...
+</p>
+
+</div>
+
+
+
+<form id="formEncomienda">
+
+
+<label>
+Descripción del paquete
+</label>
+
+<textarea
+id="descripcion"
+rows="3"
+placeholder="Ejemplo: Caja con documentos importantes"
+required></textarea>
+
+
+
+<label>
+Peso (kg)
+</label>
+
+<input
+type="number"
+id="peso"
+min="0.1"
+step="0.1"
+placeholder="Ejemplo: 2.5"
+required>
+
+
+
+<label>
+Valor declarado ($)
+</label>
+
+<input
+type="number"
+id="valor"
+min="0"
+step="0.01"
+placeholder="Ejemplo: 50.00"
+required>
+
+
+
+<label>
+Tipo de envío
+</label>
+
+<select id="tipo" required>
+
+<option value="">
+Seleccione...
+</option>
+
+<option value="Normal">
+Normal
+</option>
+
+<option value="Express">
+Express
+</option>
+
+</select>
+
+
+
+<label>
+Observaciones
+</label>
+
+<textarea
+id="observaciones"
+rows="3"
+placeholder="Información adicional">
+</textarea>
+
+
+
+<button type="submit">
+
+Registrar Encomienda
+
+</button>
+
+
+</form>
+
+
+</section>
+
+
+</main>
+
+
+
+
+<script>
+
+
+// Recuperar datos del destino
+
+const ciudad =
+sessionStorage.getItem("ciudad");
+
+const direccion =
+sessionStorage.getItem("direccion");
+
+const latitud =
+sessionStorage.getItem("latitud");
+
+const longitud =
+sessionStorage.getItem("longitud");
+
+
+
+document.getElementById("datosDestino").innerHTML = `
+
+Ciudad: ${ciudad || "No registrada"} <br>
+
+Dirección: ${direccion || "No registrada"} <br>
+
+Coordenadas:
+${latitud || "-"} ,
+${longitud || "-"}
+
+`;
+
+
+
+
+// Registro final
+
+document.getElementById("formEncomienda")
+.addEventListener("submit",function(e){
+
+e.preventDefault();
+
+
+
+const encomienda={
+
+ciudad:ciudad,
+
+direccion:direccion,
+
+latitud:latitud,
+
+longitud:longitud,
+
+descripcion:
+document.getElementById("descripcion").value,
+
+peso:
+document.getElementById("peso").value,
+
+valor:
+document.getElementById("valor").value,
+
+tipo:
+document.getElementById("tipo").value,
+
+observaciones:
+document.getElementById("observaciones").value
+
+};
+
+
+
+// Simulación de envío al servidor
+
+console.log(encomienda);
+
+
+
+alert(
+"Encomienda registrada correctamente"
+);
+
+
+// limpiar datos temporales
+
+sessionStorage.clear();
+
+
+});
+
+
+</script>
+
+
+</body>
+
+</html>
