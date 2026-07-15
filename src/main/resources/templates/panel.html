@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+<title>Panel Cliente - RutasFacil</title>
+
+
+<style>
+
+body{
+    font-family:Arial;
+    background:#f2f2f2;
+    padding:30px;
+}
+
+
+.panel{
+
+    background:white;
+    padding:30px;
+    border-radius:10px;
+    max-width:700px;
+    margin:auto;
+    box-shadow:0 0 10px #aaa;
+
+}
+
+
+button{
+
+    padding:12px;
+    width:100%;
+    background:#0066cc;
+    color:white;
+    border:none;
+    margin-top:15px;
+    cursor:pointer;
+
+}
+
+
+.pedido{
+
+    background:#eeeeee;
+    padding:20px;
+    margin-top:20px;
+    border-radius:10px;
+
+}
+
+
+.estado{
+
+    font-size:18px;
+    line-height:30px;
+
+}
+
+
+</style>
+
+
+</head>
+
+
+<body>
+
+
+<div class="panel">
+
+
+<h2>
+Bienvenido a RutasFacil
+</h2>
+
+
+<div id="datosCliente"></div>
+
+
+<button onclick="nuevoPedido()">
+Crear nuevo pedido
+</button>
+
+
+<button onclick="verPedidos()">
+Mis pedidos
+</button>
+
+
+<div id="listaPedidos"></div>
+
+
+<button onclick="cerrarSesion()">
+Cerrar sesión
+</button>
+
+
+</div>
+
+
+
+
+<script>
+
+
+let usuario = JSON.parse(
+localStorage.getItem("usuario")
+);
+
+
+
+if(usuario){
+
+
+document.getElementById("datosCliente").innerHTML = `
+
+<h3>Datos del cliente</h3>
+
+<p>
+<b>Nombre:</b>
+${usuario.cliente.nombres}
+${usuario.cliente.apellidos}
+</p>
+
+<p>
+<b>Cédula:</b>
+${usuario.cliente.cedula}
+</p>
+
+<p>
+<b>Correo:</b>
+${usuario.cliente.email}
+</p>
+
+`;
+
+}
+
+
+
+
+
+function nuevoPedido(){
+
+    window.location.href="/pedido";
+
+}
+
+
+
+
+
+function verPedidos(){
+
+
+let idCliente = usuario.cliente.id;
+
+
+fetch(
+"http://localhost:8081/entregas/cliente/"+idCliente
+)
+
+
+.then(res=>res.json())
+
+
+.then(data=>{
+
+
+let html="<h3>Mis pedidos</h3>";
+
+
+
+if(data.length==0){
+
+html += "<p>No tienes pedidos registrados</p>";
+
+}
+
+
+
+data.forEach(p=>{
+
+
+html += `
+
+
+<div class="pedido">
+
+
+<h3>
+Pedido ${p.numeroGuia}
+</h3>
+
+
+<p>
+<b>Descripción:</b>
+${p.descripcion}
+</p>
+
+
+
+<p>
+<b>Origen:</b>
+${p.ciudadOrigen.nombre}
+</p>
+
+
+<p>
+<b>Destino:</b>
+${p.ciudadDestino.nombre}
+</p>
+
+
+
+<h4>
+Seguimiento del pedido
+</h4>
+
+
+
+<div class="estado">
+
+${estadoPedido(p.estado)}
+
+</div>
+
+
+
+<p>
+<b>Última actualización:</b>
+${formatearFecha(p.fechaActualizacion)}
+</p>
+
+
+
+</div>
+
+
+`;
+
+
+
+});
+
+
+
+document.getElementById("listaPedidos").innerHTML=html;
+
+
+
+})
+
+
+.catch(error=>{
+
+console.log(error);
+
+alert("Error cargando pedidos");
+
+});
+
+
+}
+
+
+
+
+
+function estadoPedido(estado){
+
+
+let estados=[
+
+"REGISTRADA",
+"EN PROCESO",
+"EN RUTA",
+"ENTREGADA"
+
+];
+
+
+let html="";
+
+
+estados.forEach(e=>{
+
+
+if(
+estados.indexOf(e)
+<=
+estados.indexOf(estado)
+){
+
+
+html += "✓ "+e+"<br>";
+
+
+}else{
+
+
+html += "○ "+e+"<br>";
+
+
+}
+
+
+});
+
+
+return html;
+
+
+}
+
+
+
+
+
+function formatearFecha(fecha){
+
+
+if(!fecha){
+
+return "Sin actualización";
+
+}
+
+
+return fecha.replace("T"," ");
+
+
+}
+
+
+
+
+
+function cerrarSesion(){
+
+
+localStorage.clear();
+
+
+window.location.href="/login";
+
+
+}
+
+
+
+</script>
+
+
+</body>
+
+</html>
