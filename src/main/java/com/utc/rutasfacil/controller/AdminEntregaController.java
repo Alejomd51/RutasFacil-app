@@ -9,7 +9,7 @@ import com.utc.rutasfacil.service.EntregaService;
 
 @RestController
 @RequestMapping("/admin/entregas")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:8081")
 public class AdminEntregaController {
 
 

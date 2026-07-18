@@ -7,10 +7,12 @@ import org.springframework.web.bind.annotation.*;
 import com.utc.rutasfacil.entity.Entrega;
 import com.utc.rutasfacil.service.EntregaService;
 
+
 @RestController
 @RequestMapping("/entregas")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:8081")
 public class EntregaController {
+
 
     private final EntregaService entregaService;
 
@@ -20,45 +22,68 @@ public class EntregaController {
     }
 
 
+
     // Listar todas las entregas
     @GetMapping
-    public List<Entrega> listarEntregas() {
+    public List<Entrega> listarEntregas(){
+
         return entregaService.listarEntregas();
+
     }
 
 
-    // Registrar nueva entrega
+
+    // Crear entrega
     @PostMapping
-    public Entrega guardarEntrega(@RequestBody Entrega entrega) {
+    public Entrega guardarEntrega(
+            @RequestBody Entrega entrega){
+
         return entregaService.guardarEntrega(entrega);
+
     }
 
 
-    // Buscar entrega por ID
+
+    // Buscar por ID
     @GetMapping("/{id}")
-    public Entrega buscarEntrega(@PathVariable Long id) {
+    public Entrega buscarEntrega(
+            @PathVariable Long id){
+
         return entregaService.buscarEntrega(id);
+
     }
 
 
-    // Buscar por número de guía
+
+    // Buscar por guía
     @GetMapping("/guia/{numeroGuia}")
-    public Entrega buscarPorGuia(@PathVariable String numeroGuia) {
+    public Entrega buscarPorGuia(
+            @PathVariable String numeroGuia){
+
         return entregaService.buscarPorNumeroGuia(numeroGuia);
+
     }
 
 
-    // Eliminar entrega
-    @DeleteMapping("/{id}")
-    public void eliminarEntrega(@PathVariable Long id) {
-        entregaService.eliminarEntrega(id);
-    }
-    
-    @GetMapping("/cliente/{clienteId}")
-    public List<Entrega> listarEntregasCliente(
-            @PathVariable Long clienteId) {
+
+    // Pedidos del cliente
+    @GetMapping("/mis-pedidos/{clienteId}")
+    public List<Entrega> misPedidos(
+            @PathVariable Long clienteId){
 
         return entregaService.listarPorCliente(clienteId);
+
+    }
+
+
+
+    // Eliminar
+    @DeleteMapping("/{id}")
+    public void eliminarEntrega(
+            @PathVariable Long id){
+
+        entregaService.eliminarEntrega(id);
+
     }
 
 }

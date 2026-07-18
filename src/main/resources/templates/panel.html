@@ -1,359 +1,336 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Cliente - RutasFacil</title>
+    <style>
+        :root {
+            --color-primary: #0066cc;
+            --color-primary-dark: #004999;
+            --color-success: #18a957;
+            --color-warning: #ff6b35;
+            --color-light: #f2f2f2;
+            --color-white: #ffffff;
+            --color-text: #333333;
+            --color-border: #e0e0e0;
+            --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
 
-<meta charset="UTF-8">
-<title>Panel Cliente - RutasFacil</title>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: var(--font-family);
+            background: var(--color-light);
+            padding: 20px;
+            min-height: 100vh;
+        }
 
-<style>
+        .navbar {
+            background: var(--color-primary);
+            color: var(--color-white);
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
 
-body{
-    font-family:Arial;
-    background:#f2f2f2;
-    padding:30px;
-}
+        .navbar h1 {
+            margin: 0;
+            font-size: 24px;
+        }
 
+        .navbar button {
+            background: rgba(255, 255, 255, 0.2);
+            color: var(--color-white);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background 0.3s ease;
+        }
 
-.panel{
+        .navbar button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
 
-    background:white;
-    padding:30px;
-    border-radius:10px;
-    max-width:700px;
-    margin:auto;
-    box-shadow:0 0 10px #aaa;
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
 
-}
+        .panel {
+            background: var(--color-white);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        }
 
+        .panel-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--color-light);
+        }
 
-button{
+        .panel-header h2 {
+            color: var(--color-primary);
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
 
-    padding:12px;
-    width:100%;
-    background:#0066cc;
-    color:white;
-    border:none;
-    margin-top:15px;
-    cursor:pointer;
+        .panel-header p {
+            color: #666;
+            font-size: 14px;
+        }
 
-}
+        .datos-section {
+            background: linear-gradient(135deg, #f0f4ff 0%, #f5f7ff 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border: 1px solid var(--color-border);
+        }
 
+        .datos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
 
-.pedido{
+        .dato-item {
+            padding: 12px;
+            background: var(--color-white);
+            border-radius: 8px;
+            border-left: 4px solid var(--color-primary);
+        }
 
-    background:#eeeeee;
-    padding:20px;
-    margin-top:20px;
-    border-radius:10px;
+        .dato-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #999;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
 
-}
+        .dato-valor {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--color-text);
+        }
 
+        .acciones {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
 
-.estado{
+        .btn {
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: var(--font-family);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-decoration: none;
+        }
 
-    font-size:18px;
-    line-height:30px;
+        .btn-primary {
+            background: var(--color-primary);
+            color: var(--color-white);
+        }
 
-}
+        .btn-primary:hover {
+            background: var(--color-primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3);
+        }
 
+        .btn-success {
+            background: var(--color-success);
+            color: var(--color-white);
+        }
 
-</style>
+        .btn-success:hover {
+            background: #138a4a;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(24, 169, 87, 0.3);
+        }
 
+        .btn-warning {
+            background: var(--color-warning);
+            color: var(--color-white);
+        }
 
+        .btn-warning:hover {
+            background: #e55a1f;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+        }
+
+        .btn-danger {
+            background: #d32f2f;
+            color: var(--color-white);
+        }
+
+        .btn-danger:hover {
+            background: #b71c1c;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(211, 47, 47, 0.3);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .panel {
+                padding: 20px;
+            }
+
+            .navbar {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .datos-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .acciones {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
-
-
 <body>
-
-
-<div class="panel">
-
-
-<h2>
-Bienvenido a RutasFacil
-</h2>
-
-
-<div id="datosCliente"></div>
-
-
-<button onclick="nuevoPedido()">
-Crear nuevo pedido
-</button>
-
-
-<button onclick="verPedidos()">
-Mis pedidos
-</button>
-
-
-<div id="listaPedidos"></div>
-
-
-<button onclick="cerrarSesion()">
-Cerrar sesión
-</button>
-
-
-</div>
-
-
-
-
-<script>
-
-
-let usuario = JSON.parse(
-localStorage.getItem("usuario")
-);
-
-
-
-if(usuario){
-
-
-document.getElementById("datosCliente").innerHTML = `
-
-<h3>Datos del cliente</h3>
-
-<p>
-<b>Nombre:</b>
-${usuario.cliente.nombres}
-${usuario.cliente.apellidos}
-</p>
-
-<p>
-<b>Cédula:</b>
-${usuario.cliente.cedula}
-</p>
-
-<p>
-<b>Correo:</b>
-${usuario.cliente.email}
-</p>
-
-`;
-
-}
-
-
-
-
-
-function nuevoPedido(){
-
-    window.location.href="/pedido";
-
-}
-
-
-
-
-
-function verPedidos(){
-
-
-let idCliente = usuario.cliente.id;
-
-
-fetch(
-"http://localhost:8081/entregas/cliente/"+idCliente
-)
-
-
-.then(res=>res.json())
-
-
-.then(data=>{
-
-
-let html="<h3>Mis pedidos</h3>";
-
-
-
-if(data.length==0){
-
-html += "<p>No tienes pedidos registrados</p>";
-
-}
-
-
-
-data.forEach(p=>{
-
-
-html += `
-
-
-<div class="pedido">
-
-
-<h3>
-Pedido ${p.numeroGuia}
-</h3>
-
-
-<p>
-<b>Descripción:</b>
-${p.descripcion}
-</p>
-
-
-
-<p>
-<b>Origen:</b>
-${p.ciudadOrigen.nombre}
-</p>
-
-
-<p>
-<b>Destino:</b>
-${p.ciudadDestino.nombre}
-</p>
-
-
-
-<h4>
-Seguimiento del pedido
-</h4>
-
-
-
-<div class="estado">
-
-${estadoPedido(p.estado)}
-
-</div>
-
-
-
-<p>
-<b>Última actualización:</b>
-${formatearFecha(p.fechaActualizacion)}
-</p>
-
-
-
-</div>
-
-
-`;
-
-
-
-});
-
-
-
-document.getElementById("listaPedidos").innerHTML=html;
-
-
-
-})
-
-
-.catch(error=>{
-
-console.log(error);
-
-alert("Error cargando pedidos");
-
-});
-
-
-}
-
-
-
-
-
-function estadoPedido(estado){
-
-
-let estados=[
-
-"REGISTRADA",
-"EN PROCESO",
-"EN RUTA",
-"ENTREGADA"
-
-];
-
-
-let html="";
-
-
-estados.forEach(e=>{
-
-
-if(
-estados.indexOf(e)
-<=
-estados.indexOf(estado)
-){
-
-
-html += "✓ "+e+"<br>";
-
-
-}else{
-
-
-html += "○ "+e+"<br>";
-
-
-}
-
-
-});
-
-
-return html;
-
-
-}
-
-
-
-
-
-function formatearFecha(fecha){
-
-
-if(!fecha){
-
-return "Sin actualización";
-
-}
-
-
-return fecha.replace("T"," ");
-
-
-}
-
-
-
-
-
-function cerrarSesion(){
-
-
-localStorage.clear();
-
-
-window.location.href="/login";
-
-
-}
-
-
-
-</script>
-
-
+    <div class="navbar">
+        <h1>🚚 RutasFacil</h1>
+        <button onclick="cerrarSesion()">🚪 Cerrar Sesión</button>
+    </div>
+
+    <div class="container">
+        <div class="panel">
+            <div class="panel-header">
+                <h2>Bienvenido a RutasFacil</h2>
+                <p>Gestiona tus entregas de forma fácil y rápida</p>
+            </div>
+
+            <div class="datos-section" id="datosCliente">
+                <div class="loading">Cargando información...</div>
+            </div>
+
+            <div class="acciones">
+                <button class="btn btn-primary" onclick="nuevoPedido()">
+                    ➕ Crear nuevo pedido
+                </button>
+                <button class="btn btn-success" onclick="verPedidos()">
+                    📋 Mis pedidos
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.origin;
+
+        // Verificar autenticación
+        function verificarAutenticacion() {
+            const usuario = localStorage.getItem('usuario');
+            if (!usuario) {
+                window.location.href = '/login';
+                return;
+            }
+            cargarDatos();
+        }
+
+        // Cargar datos del cliente
+        function cargarDatos() {
+            const usuarioStr = localStorage.getItem('usuario');
+            if (!usuarioStr) return;
+
+            const usuario = JSON.parse(usuarioStr);
+            const cliente = usuario.cliente;
+
+            const datosHTML = `
+                <div class="datos-grid">
+                    <div class="dato-item">
+                        <div class="dato-label">👤 Nombres</div>
+                        <div class="dato-valor">${cliente.nombres || 'No disponible'}</div>
+                    </div>
+                    <div class="dato-item">
+                        <div class="dato-label">👥 Apellidos</div>
+                        <div class="dato-valor">${cliente.apellidos || 'No disponible'}</div>
+                    </div>
+                    <div class="dato-item">
+                        <div class="dato-label">🆔 Cédula</div>
+                        <div class="dato-valor">${cliente.cedula || 'No disponible'}</div>
+                    </div>
+                    <div class="dato-item">
+                        <div class="dato-label">📧 Correo</div>
+                        <div class="dato-valor">${cliente.email || 'No disponible'}</div>
+                    </div>
+                    <div class="dato-item">
+                        <div class="dato-label">📱 Teléfono</div>
+                        <div class="dato-valor">${cliente.telefono || 'No disponible'}</div>
+                    </div>
+                    <div class="dato-item">
+                        <div class="dato-label">👤 Usuario</div>
+                        <div class="dato-valor">${usuario.username}</div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('datosCliente').innerHTML = datosHTML;
+        }
+
+        // Navegación
+        function nuevoPedido() {
+            window.location.href = '/pedido';
+        }
+
+        function verPedidos() {
+            window.location.href = '/mispedidos';
+        }
+
+        function cerrarSesion() {
+            if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+                localStorage.removeItem('usuario');
+                window.location.href = '/login';
+            }
+        }
+
+        // Inicializar al cargar
+        document.addEventListener('DOMContentLoaded', verificarAutenticacion);
+    </script>
 </body>
-
 </html>

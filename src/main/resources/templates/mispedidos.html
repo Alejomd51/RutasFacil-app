@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Mis Pedidos - RutasFacil</title>
+
+
+<link rel="stylesheet"
+href="https://unpkg.com/leaflet/dist/leaflet.css">
+
+
+<style>
+
+body{
+
+    font-family:Arial,sans-serif;
+    background:#f2f2f2;
+    margin:0;
+    padding:20px;
+
+}
+
+
+
+.contenedor{
+
+    max-width:1000px;
+    margin:auto;
+    background:white;
+    padding:25px;
+    border-radius:12px;
+    box-shadow:0 0 10px #aaa;
+
+}
+
+
+
+h2{
+
+    color:#10493d;
+
+}
+
+
+
+button{
+
+    background:#0066cc;
+    color:white;
+    border:none;
+    padding:12px;
+
+    border-radius:6px;
+    cursor:pointer;
+
+    margin:5px;
+
+}
+
+
+
+button:hover{
+
+    background:#004999;
+
+}
+
+
+
+.pedido{
+
+    background:#eeeeee;
+    padding:20px;
+    margin-top:20px;
+    border-radius:10px;
+
+}
+
+
+
+.estado{
+
+    background:white;
+    padding:15px;
+    border-radius:8px;
+    line-height:28px;
+
+}
+
+
+
+.ruta{
+
+    background:#e5f5ec;
+    padding:15px;
+    border-radius:8px;
+    margin-top:15px;
+
+}
+
+
+
+#mapa{
+
+    height:450px;
+    margin-top:20px;
+    border-radius:10px;
+
+}
+
+
+</style>
+
+</head>
+
+
+
+<body>
+
+
+
+<div class="contenedor">
+
+
+<h2>
+Mis pedidos
+</h2>
+
+
+
+<button onclick="volverPanel()">
+
+← Volver al panel
+
+</button>
+
+
+
+<div id="listaPedidos">
+
+Cargando pedidos...
+
+</div>
+
+
+
+<div id="mapa"></div>
+
+
+
+</div>
+
+
+
+
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+
+
+<script>
+
+
+let usuario =
+JSON.parse(localStorage.getItem("usuario"));
+
+
+
+if(!usuario || !usuario.cliente){
+
+
+alert("Sesión no encontrada");
+
+
+window.location.href="/login";
+
+
+}
+
+
+
+let idCliente =
+usuario.cliente.id;
+
+
+
+
+
+let mapa =
+L.map("mapa")
+.setView(
+[-1.8312,-78.1834],
+7
+);
+
+
+
+
+L.tileLayer(
+"https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+{
+
+attribution:"OpenStreetMap"
+
+}
+
+).addTo(mapa);
+
+
+
+
+
+let capaRuta =
+L.layerGroup()
+.addTo(mapa);
+
+
+
+
+
+
+function volverPanel(){
+
+
+window.location.href="/panel";
+
+
+}
+
+
+
+
+
+
+
+async function cargarPedidos(){
+
+
+try{
+
+
+let respuesta =
+await fetch(
+"/entregas/mis-pedidos/"+idCliente
+);
+
+
+
+if(!respuesta.ok){
+
+throw new Error(
+"No se pudieron cargar pedidos"
+);
+
+}
+
+
+
+let pedidos =
+await respuesta.json();
+
+
+
+let html="";
+
+
+
+
+if(pedidos.length===0){
+
+
+html=
+"<p>No tienes pedidos registrados</p>";
+
+
+
+}
+
+
+
+
+
+pedidos.forEach(p=>{
+
+
+
+html+=`
+
+<div class="pedido">
+
+
+<h3>
+Pedido ${p.numeroGuia}
+</h3>
+
+
+
+<p>
+<b>Descripción:</b>
+${p.descripcion}
+</p>
+
+
+
+<p>
+<b>Origen:</b>
+${p.ciudadOrigen.nombre}
+</p>
+
+
+
+<p>
+<b>Destino:</b>
+${p.ciudadDestino.nombre}
+</p>
+
+
+
+
+
+<div class="estado">
+
+<b>Estado:</b>
+
+<br>
+
+${estadoPedido(p.estado)}
+
+</div>
+
+
+
+
+
+<div class="ruta" id="ruta${p.id}">
+
+Cargando ruta óptima...
+
+</div>
+
+
+
+
+
+<button onclick="
+verRuta(
+${p.ciudadOrigen.id},
+${p.ciudadDestino.id}
+)">
+
+Ver ruta en mapa
+
+</button>
+
+
+
+
+</div>
+
+
+`;
+
+
+
+});
+
+
+
+
+document.getElementById(
+"listaPedidos"
+).innerHTML=html;
+
+
+
+
+
+pedidos.forEach(p=>{
+
+
+cargarRutaTexto(
+
+p.id,
+
+p.ciudadOrigen.id,
+
+p.ciudadDestino.id
+
+);
+
+
+
+});
+
+
+
+
+}catch(error){
+
+
+console.log(error);
+
+
+
+document.getElementById(
+"listaPedidos"
+).innerHTML=
+"Error cargando pedidos";
+
+
+
+}
+
+
+}
+
+
+
+
+async function cargarRutaTexto(
+idPedido,
+origenId,
+destinoId
+){
+
+
+try{
+
+
+let respuesta =
+await fetch(
+
+`/rutas/optima/${origenId}/${destinoId}`
+
+);
+
+
+
+if(!respuesta.ok){
+
+throw new Error();
+
+}
+
+
+
+let ruta =
+await respuesta.json();
+
+
+
+
+let elemento =
+document.getElementById(
+"ruta"+idPedido
+);
+
+
+
+
+
+if(ruta.encontrada===false){
+
+
+elemento.innerHTML =
+"❌ No existe ruta disponible";
+
+
+return;
+
+
+}
+
+
+
+
+
+elemento.innerHTML=
+
+`
+
+<b>Ruta óptima:</b><br><br>
+
+${ruta.ciudadesRecorridas.join(" → ")}
+
+
+<br><br>
+
+
+<b>Distancia:</b>
+
+${ruta.distanciaTotal}
+
+km
+
+
+`;
+
+
+
+
+}catch(error){
+
+
+document.getElementById(
+"ruta"+idPedido
+).innerHTML=
+
+"Error obteniendo ruta";
+
+
+}
+
+
+}
+
+
+
+
+
+
+
+
+async function verRuta(
+origenId,
+destinoId
+){
+
+
+
+try{
+
+
+
+capaRuta.clearLayers();
+
+
+
+let respuesta =
+await fetch(
+
+`/rutas/optima/${origenId}/${destinoId}`
+
+);
+
+
+
+
+let ruta =
+await respuesta.json();
+
+
+
+
+
+
+if(!ruta.ciudadesRecorridas){
+
+alert(
+"No existe ruta"
+);
+
+return;
+
+}
+
+
+
+
+
+let puntos=[];
+
+
+
+
+for(let ciudad of ruta.ciudadesRecorridas){
+
+
+
+let respuestaCiudad =
+await fetch(
+"/ciudades"
+);
+
+
+
+let ciudades =
+await respuestaCiudad.json();
+
+
+
+
+let encontrada =
+ciudades.find(
+c=>c.nombre===ciudad
+);
+
+
+
+
+if(encontrada){
+
+
+let punto=[
+
+Number(encontrada.latitud),
+
+Number(encontrada.longitud)
+
+];
+
+
+puntos.push(punto);
+
+
+
+L.marker(punto)
+
+.addTo(capaRuta)
+
+.bindPopup(ciudad);
+
+
+
+}
+
+
+
+}
+
+
+
+
+
+
+
+if(puntos.length>1){
+
+
+
+let linea =
+L.polyline(
+puntos,
+{
+color:"green",
+weight:5
+}
+)
+.addTo(capaRuta);
+
+
+
+
+mapa.fitBounds(
+linea.getBounds()
+);
+
+
+
+}
+
+
+
+
+}catch(error){
+
+
+
+console.log(error);
+
+
+alert(
+"No se pudo mostrar la ruta"
+);
+
+
+
+}
+
+
+
+}
+
+
+
+
+
+
+
+
+function estadoPedido(estado){
+
+
+
+let pasos=[
+
+"REGISTRADA",
+
+"ASIGNADA",
+
+"EN RUTA",
+
+"ENTREGADA"
+
+];
+
+
+
+let html="";
+
+
+
+pasos.forEach(p=>{
+
+
+
+if(
+pasos.indexOf(p)
+<=
+pasos.indexOf(estado)
+){
+
+
+html+=
+"✓ "+p+"<br>";
+
+
+
+}else{
+
+
+html+=
+"○ "+p+"<br>";
+
+
+}
+
+
+
+});
+
+
+
+
+return html;
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+cargarPedidos();
+
+
+
+
+</script>
+
+
+
+</body>
+
+
+</html>

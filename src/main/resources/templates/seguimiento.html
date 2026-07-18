@@ -1,0 +1,75 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RutasFacil - Seguimiento</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Segoe UI,Arial;background:#eef2f3}
+#map{position:fixed;inset:0 0 0 360px}
+aside{position:fixed;left:0;top:0;bottom:0;width:360px;background:#fff;overflow:auto;box-shadow:2px 0 12px rgba(0,0,0,.15)}
+header{background:#10493D;color:#fff;padding:20px}
+.card{margin:16px;padding:16px;border-radius:12px;background:#f7f7f7}
+.badge{display:inline-block;padding:6px 10px;border-radius:20px;background:#ff6b35;color:#fff;font-weight:700}
+.timeline{margin:10px 0 0 14px;border-left:3px solid #ddd;padding-left:18px}
+.step{margin:16px 0;position:relative}
+.step:before{content:"";position:absolute;left:-25px;top:3px;width:12px;height:12px;border-radius:50%;background:#bbb}
+.step.active:before{background:#18a957}
+ul{padding-left:18px}
+@media(max-width:900px){aside{position:relative;width:100%;height:auto}#map{position:relative;left:0;height:420px}}
+</style>
+</head>
+<body>
+<aside>
+<header><h2>RutasFacil</h2><div id="guia">Pedido</div></header>
+<div class="card">
+<div class="badge" id="estado">...</div>
+<p><b>Origen:</b> <span id="origen"></span></p>
+<p><b>Destino:</b> <span id="destino"></span></p>
+<p><b>Distancia:</b> <span id="distancia"></span></p>
+<p><b>Tiempo:</b> <span id="tiempo"></span></p>
+</div>
+<div class="card">
+<h3>Seguimiento</h3>
+<div class="timeline">
+<div class="step" id="s1">Registrada</div>
+<div class="step" id="s2">En proceso</div>
+<div class="step" id="s3">En ruta</div>
+<div class="step" id="s4">Entregada</div>
+</div>
+</div>
+<div class="card">
+<h3>Ruta óptima (Dijkstra)</h3>
+<ul id="lista"></ul>
+</div>
+</aside>
+<div id="map"></div>
+<script>
+let map,dirS,dirR;
+function activar(e){["s1","s2","s3","s4"].forEach(x=>document.getElementById(x).classList.remove("active"));
+if(e=="REGISTRADA")s1.classList.add("active");
+if(e=="EN_PROCESO"){s1.classList.add("active");s2.classList.add("active");}
+if(e=="EN_RUTA"){s1.classList.add("active");s2.classList.add("active");s3.classList.add("active");}
+if(e=="ENTREGADA"){s1.classList.add("active");s2.classList.add("active");s3.classList.add("active");s4.classList.add("active");}
+}
+async function initMap(){
+map=new google.maps.Map(document.getElementById("map"),{zoom:7,center:{lat:-1.5,lng:-78.8}});
+dirS=new google.maps.DirectionsService();dirR=new google.maps.DirectionsRenderer({map});
+const id=new URLSearchParams(location.search).get("id");
+const e=await(await fetch("/entregas/"+id)).json();
+guia.innerText=e.numeroGuia;estado.innerText=e.estado;activar(e.estado);
+origen.innerText=e.ciudadOrigen.nombre;destino.innerText=e.ciudadDestino.nombre;
+const r=await(await fetch("/rutas/optima/"+e.ciudadOrigen.id+"/"+e.ciudadDestino.id)).json();
+distancia.innerText=r.distanciaTotal+" km";
+lista.innerHTML="";
+r.ciudadesRecorridas.forEach(c=>lista.innerHTML+="<li>"+c+"</li>");
+const wp=r.ciudadesRecorridas.slice(1,-1).map(c=>({location:c,stopover:true}));
+dirS.route({origin:r.ciudadOrigen,destination:r.ciudadDestino,waypoints:wp,travelMode:"DRIVING"},(res,st)=>{
+if(st==="OK"){dirR.setDirections(res);let sec=0;res.routes[0].legs.forEach(l=>sec+=l.duration.value);tiempo.innerText=Math.round(sec/60)+" min";}
+});
+}
+</script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=TU_API_KEY&callback=initMap"></script>
+</body>
+</html>

@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+<title>Mis Pedidos - RutasFacil</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+
+<style>
+
+body{
+
+    font-family:Arial;
+    background:#f2f2f2;
+    padding:20px;
+
+}
+
+
+.contenedor{
+
+    background:white;
+    padding:25px;
+    border-radius:10px;
+    max-width:900px;
+    margin:auto;
+    box-shadow:0 0 10px #aaa;
+
+}
+
+
+.pedido{
+
+    background:#eeeeee;
+    padding:20px;
+    margin-top:20px;
+    border-radius:10px;
+
+}
+
+
+.estado{
+
+    font-size:18px;
+    line-height:30px;
+
+}
+
+
+button{
+
+    padding:12px;
+    background:#0066cc;
+    color:white;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+
+}
+
+
+#mapa{
+
+    height:400px;
+    margin-top:20px;
+    border-radius:10px;
+
+}
+
+
+</style>
+
+
+</head>
+
+
+<body>
+
+
+<div class="contenedor">
+
+
+<h2>
+Mis pedidos
+</h2>
+
+
+<button onclick="volver()">
+Volver al panel
+</button>
+
+
+
+<div id="listaPedidos">
+
+Cargando pedidos...
+
+</div>
+
+
+<div id="mapa"></div>
+
+
+</div>
+
+
+
+
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+
+
+<script>
+
+
+let usuario = JSON.parse(
+localStorage.getItem("usuario")
+);
+
+
+
+if(!usuario){
+
+alert("Sesión no encontrada");
+
+window.location.href="/login";
+
+}
+
+
+
+let idCliente = usuario.cliente.id;
+
+
+
+let mapa = L.map('mapa')
+.setView([-0.1807,-78.4678],13);
+
+
+
+L.tileLayer(
+'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
+).addTo(mapa);
+
+
+
+
+
+function cargarPedidos(){
+
+
+
+	fetch(
+			"http://localhost:8081/entregas/mis-pedidos/"+idCliente
+			)
+
+
+
+.then(res=>res.json())
+
+
+
+.then(data=>{
+
+
+let html="";
+
+
+
+if(data.length==0){
+
+
+html="<p>No tienes pedidos registrados</p>";
+
+
+}
+
+
+
+data.forEach(p=>{
+
+
+html += `
+
+
+<div class="pedido">
+
+
+<h3>
+Pedido ${p.numeroGuia}
+</h3>
+
+
+
+<p>
+<b>Descripción:</b>
+${p.descripcion}
+</p>
+
+
+
+<p>
+<b>Origen:</b>
+${p.direccionOrigen}
+</p>
+
+
+
+<p>
+<b>Destino:</b>
+${p.direccionDestino}
+</p>
+
+
+
+<p>
+<b>Estado:</b>
+</p>
+
+
+
+<div class="estado">
+
+${estadoPedido(p.estado)}
+
+</div>
+
+
+
+<p>
+
+<b>Última actualización:</b>
+
+${formatearFecha(p.fechaActualizacion)}
+
+</p>
+
+
+
+<button onclick="
+mostrarMapa(
+${p.latitudDestino},
+${p.longitudDestino}
+)">
+
+Ver ubicación
+
+</button>
+
+
+
+</div>
+
+
+
+`;
+
+
+
+});
+
+
+
+document.getElementById("listaPedidos")
+.innerHTML=html;
+
+
+
+})
+
+.catch(error=>{
+
+
+console.log(error);
+
+
+document.getElementById("listaPedidos")
+.innerHTML="Error cargando pedidos";
+
+
+});
+
+
+
+}
+
+
+
+
+
+
+function mostrarMapa(lat,lon){
+
+
+
+mapa.setView(
+[lat,lon],
+16
+);
+
+
+
+L.marker([lat,lon])
+.addTo(mapa)
+.bindPopup(
+"Destino del pedido"
+)
+.openPopup();
+
+
+
+}
+
+
+
+
+
+
+
+function estadoPedido(estado){
+
+
+
+let estados=[
+
+"REGISTRADA",
+"EN PROCESO",
+"EN RUTA",
+"ENTREGADA"
+
+];
+
+
+
+let html="";
+
+
+
+estados.forEach(e=>{
+
+
+if(
+estados.indexOf(e)
+<=
+estados.indexOf(estado)
+){
+
+
+html+="✓ "+e+"<br>";
+
+
+}else{
+
+
+html+="○ "+e+"<br>";
+
+
+}
+
+
+});
+
+
+
+return html;
+
+
+}
+
+
+
+
+
+function formatearFecha(fecha){
+
+
+if(!fecha){
+
+return "Sin actualización";
+
+}
+
+
+return fecha.replace("T"," ");
+
+
+}
+
+
+
+
+
+function volver(){
+
+
+	window.location.href="/panel";
+
+
+}
+
+
+
+
+
+cargarPedidos();
+
+
+
+</script>
+
+
+
+</body>
+
+</html>
