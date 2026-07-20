@@ -716,6 +716,8 @@ let pasos=[
 
 let html="";
 
+// Normalizar el estado: reemplazar guiones bajos con espacios
+estado = estado.replace(/_/g, " ");
 
 
 pasos.forEach(p=>{
