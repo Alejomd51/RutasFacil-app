@@ -138,7 +138,11 @@ Mis pedidos
 
 </button>
 
+<button onclick="cargarPedidos()">
 
+🔄 Recargar
+
+</button>
 
 <div id="listaPedidos">
 
@@ -773,6 +777,8 @@ return html;
 
 cargarPedidos();
 
+// Actualizar pedidos cada 10 segundos automáticamente
+setInterval(cargarPedidos, 10000);
 
 
 
