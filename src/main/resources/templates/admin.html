@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Administrador - RutasFacil</title>
+    <style>
+        :root {
+            --color-primary: #0066cc;
+            --color-primary-dark: #004999;
+            --color-success: #18a957;
+            --color-warning: #ff6b35;
+            --color-error: #d32f2f;
+            --color-light: #f2f2f2;
+            --color-white: #ffffff;
+            --color-text: #333333;
+            --color-border: #e0e0e0;
+            --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: var(--color-light);
+            padding: 20px;
+        }
+
+        header {
+            background: var(--color-primary);
+            color: var(--color-white);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        header p {
+            margin: 5px 0 0 0;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: var(--font-family);
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-family: var(--font-family);
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: var(--color-white);
+        }
+
+        .btn-primary:hover {
+            background: var(--color-primary-dark);
+        }
+
+        .btn-success {
+            background: var(--color-success);
+            color: var(--color-white);
+        }
+
+        .btn-success:hover {
+            background: #138a4a;
+        }
+
+        .btn-small {
+            padding: 8px 12px;
+            font-size: 12px;
+        }
+
+        .lista-pedidos {
+            display: grid;
+            gap: 15px;
+        }
+
+        .pedido-card {
+            background: var(--color-white);
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid var(--color-primary);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .pedido-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        }
+
+        .pedido-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .pedido-numero {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--color-text);
+        }
+
+        .pedido-estado {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .estado-registrada {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .estado-asignada {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .estado-en-ruta {
+            background: #e8f5e9;
+            color: var(--color-success);
+        }
+
+        .estado-entregada {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .pedido-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .info-item {
+            font-size: 14px;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            color: var(--color-text);
+        }
+
+        .pedido-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        select {
+            padding: 10px;
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: var(--font-family);
+            cursor: pointer;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--color-primary);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            background: var(--color-white);
+            border-radius: 8px;
+            color: #999;
+        }
+
+        .empty-state svg {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+
+        .spinner {
+            border: 3px solid var(--color-light);
+            border-top: 3px solid var(--color-primary);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            header {
+                padding: 15px;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            .pedido-info {
+                grid-template-columns: 1fr;
+            }
+
+            .pedido-actions {
+                flex-direction: column;
+            }
+
+            select {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🚚 RutasFacil - Panel Administrador</h1>
+        <p>Gestión de entregas y rutas</p>
+    </header>
+
+    <div class="container">
+        <div class="controls">
+            <div class="search-box">
+                <input 
+                    type="text" 
+                    id="busqueda"
+                    placeholder="Buscar por número de guía o cliente..."
+                    aria-label="Buscar entregas">
+            </div>
+            <button class="btn btn-primary" onclick="cargarPedidos()">🔄 Recargar</button>
+        </div>
+
+        <div id="lista" class="lista-pedidos"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8081';
+        let todosPedidos = [];
+
+        function cargarPedidos() {
+            const lista = document.getElementById('lista');
+            lista.innerHTML = '<div class="loading"><div class="spinner"></div>Cargando entregas...</div>';
+
+            fetch(`${API_BASE}/admin/entregas`)
+                .then(res => {
+                    if (!res.ok) throw new Error('Error al cargar datos');
+                    return res.json();
+                })
+                .then(data => {
+                    todosPedidos = data || [];
+                    renderizarPedidos(todosPedidos);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    lista.innerHTML = `<div class="empty-state">⚠️ Error al cargar las entregas. Intenta de nuevo.</div>`;
+                });
+        }
+
+        function renderizarPedidos(pedidos) {
+            const lista = document.getElementById('lista');
+
+            if (!pedidos || pedidos.length === 0) {
+                lista.innerHTML = '<div class="empty-state">📭 No hay entregas registradas</div>';
+                return;
+            }
+
+            let html = '';
+            pedidos.forEach(p => {
+                const estadoClass = `estado-${p.estado.toLowerCase().replace(/ /g, '-')}`;
+                html += `
+                    <div class="pedido-card">
+                        <div class="pedido-header">
+                            <span class="pedido-numero">#${p.numeroGuia}</span>
+                            <span class="pedido-estado ${estadoClass}">${p.estado}</span>
+                        </div>
+                        <div class="pedido-info">
+                            <div class="info-item">
+                                <div class="info-label">👤 Cliente</div>
+                                <div class="info-value">${p.cliente.nombres} ${p.cliente.apellidos}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">📍 Origen</div>
+                                <div class="info-value">${p.ciudadOrigen.nombre}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">🎯 Destino</div>
+                                <div class="info-value">${p.ciudadDestino.nombre}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">📦 Tipo</div>
+                                <div class="info-value">${p.tipoPaquete.nombre}</div>
+                            </div>
+                        </div>
+                        <div class="pedido-actions">
+                            <select id="estado${p.id}" aria-label="Cambiar estado">
+                                <option value="REGISTRADA" ${p.estado === 'REGISTRADA' ? 'selected' : ''}>REGISTRADA</option>
+                                <option value="ASIGNADA" ${p.estado === 'ASIGNADA' ? 'selected' : ''}>ASIGNADA</option>
+                                <option value="EN_RUTA" ${p.estado === 'EN_RUTA' ? 'selected' : ''}>EN RUTA</option>
+                                <option value="ENTREGADA" ${p.estado === 'ENTREGADA' ? 'selected' : ''}>ENTREGADA</option>
+                            </select>
+                            <button class="btn btn-success btn-small" onclick="cambiarEstado(${p.id})">✓ Actualizar</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            lista.innerHTML = html;
+        }
+
+        function cambiarEstado(id) {
+            const selectElement = document.getElementById(`estado${id}`);
+            const nuevoEstado = selectElement.value;
+
+            fetch(`${API_BASE}/admin/entregas/${id}/estado?estado=${nuevoEstado}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(res => {
+                    if (!res.ok) throw new Error('Error al actualizar');
+                    return res.json();
+                })
+                .then(() => {
+                    alert(`✓ Estado actualizado a: ${nuevoEstado}`);
+                    cargarPedidos();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('❌ Error al actualizar el estado. Intenta de nuevo.');
+                });
+        }
+
+        // Búsqueda en tiempo real
+        document.getElementById('busqueda').addEventListener('keyup', function(e) {
+            const termino = e.target.value.toLowerCase();
+            const filtrados = todosPedidos.filter(p => 
+                p.numeroGuia.toLowerCase().includes(termino) ||
+                p.cliente.nombres.toLowerCase().includes(termino) ||
+                p.cliente.apellidos.toLowerCase().includes(termino)
+            );
+            renderizarPedidos(filtrados);
+        });
+
+        // Cargar pedidos al abrir la página
+        document.addEventListener('DOMContentLoaded', cargarPedidos);
+    </script>
+</body>
+</html>

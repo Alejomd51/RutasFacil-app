@@ -6,10 +6,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.utc.rutasfacil.entity.Entrega;
 
-public interface EntregaRepository extends JpaRepository<Entrega, Long> {
+
+public interface EntregaRepository 
+extends JpaRepository<Entrega, Long>{
+
 
     Entrega findByNumeroGuia(String numeroGuia);
 
+
     List<Entrega> findByClienteId(Long clienteId);
+
 
 }
